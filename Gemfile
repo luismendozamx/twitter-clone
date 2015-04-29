@@ -42,4 +42,6 @@ gem 'spring',        group: :development
 gem 'bootstrap-sass', '~> 3.3.4'
 gem 'simple_form'
 gem 'faker', group: :development
+gem 'will_paginate'
+gem 'bootstrap-will_paginate'
 

@@ -1,7 +1,18 @@
-# Comandos a ejecutar
+# Tutorial de Rails
 
+Crear un mini clon de Twitter.
 
-###Crear Aplicación
+## Dependencias
+
+Para poder seguir este tutorial se requiere:
+* Instalar Ruby > 2.1.2
+* Intsalar Rails > 4.1.6
+* Instalar Postrgesql (Se puede utilizar mysql o sqlite)
+* Se asume un sistema operativo Unix (Linux o Mac)
+
+## Pasos a seguir
+
+### Crear Aplicación
 
 ```
 rails new twitter --database=postgresql --skip-test-unit
@@ -41,7 +52,7 @@ rails generate simple_form:install --bootstrap
 
 Reiniciar el servidor para mostrar cambios.
 
-###Crear el primer scaffold
+### Crear el primer scaffold
 ```
 rails generate scaffold status content:string
 ```
@@ -50,7 +61,7 @@ Generar migración en la base
 ```
 rake db:migrate
 ```
-###Mejorar nuestras vistas
+### Mejorar nuestras vistas
 
 Borrar el contenido de app/assets/stylesheets/scaffolds.css.scss
 
@@ -117,7 +128,7 @@ En app/views/statuses/index.html.erb:
 ...
 ```
 
-###Modificar Rutas
+### Modificar Rutas
 
 En config/routes.rb agregar:
 ```
@@ -133,16 +144,17 @@ por
 <%= link_to "Twitter", root_path, class: "navbar-brand" %>
 ```
 
-###Ordenar Tweets
-En app/controllers/statuses_controllers cambiar el contenido de index por:
+### Ordenar Tweets
+En app/controllers/statuses_controllers.rb cambiar el contenido de index por:
 ```
 @statuses = Status.order('created_at DESC').all
 ```
 
-###Generar información aleatoria y paginación
+### Generar información aleatoria y paginación
 En Gemfile agregar
 ```
 gem 'faker', group: :development
+gem 'will_paginate'
 ```
 Ejecutar
 ```
@@ -157,5 +169,24 @@ Para usar Faker en db/seeds.rb agregar:
   Status.create!(content: content, created_at: time)
 end
 ```
+
+Apagar servidor y correr:
+```
+rake db:reset
+```
+
+Para agregar paginación en app/controllers/statuses_controllers.rb
+
+En app/controllers/statuses_controllers.rb cambiar el contenido de index por:
+```
+@statuses = Status.paginate(page: params[:page], per_page: 10).order('created_at DESC').all
+```
+
+En app/views/statuses/index.html.erb agregar:
+```
+<%= will_paginate %>
+```
+
+
 
 

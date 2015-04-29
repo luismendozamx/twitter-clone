@@ -4,7 +4,7 @@ class StatusesController < ApplicationController
   # GET /statuses
   # GET /statuses.json
   def index
-    @statuses = Status.order('created_at DESC').all
+    @statuses = Status.paginate(page: params[:page], per_page: 10).order('created_at DESC').all
   end
 
   # GET /statuses/1
