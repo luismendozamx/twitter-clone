@@ -1,0 +1,14 @@
+<%= link_to 'Post New Tweet', new_status_path, class: "btn btn-default" %>
+
+<h1>Twitter Feed</h1>
+
+<% @statuses.each do |status| %>
+<div class="col-sm-12 tweet">
+  <td><%= status.content %></td>
+  <div class="tweet-info">
+    <%= link_to 'Show', status %> |
+    <%= link_to 'Edit', edit_status_path(status) %> |
+    <%= link_to 'Destroy', status, method: :delete, data: { confirm: 'Are you sure?' } %>
+  </div>
+</div>
+<% end %>

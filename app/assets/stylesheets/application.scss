@@ -16,3 +16,18 @@
 
 @import "bootstrap-sprockets";
 @import "bootstrap";
+
+.tweet{
+  background-color: #eee;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.tweet .tweet-info{
+  display: none;
+}
+
+.tweet:hover .tweet-info{
+  display: block;
+  float: right;
+}
