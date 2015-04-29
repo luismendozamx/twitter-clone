@@ -9,14 +9,14 @@ rake db:create
 rake db:migrate
 ```
 
-Agregar gems iniciales
+Agregar gems iniciales. En Gemfile:
 
 ```
 gem 'bootstrap-sass', '~> 3.3.4'
 gem 'simple_form'
 ```
 
-Instalar gems
+Instalar gems. Ejecutar:
 ```
 bundle install
 ```
@@ -91,7 +91,7 @@ En app/views/statuses/index.html.erb sustituir todo el código por:
 
 <% @statuses.each do |status| %>
 <div class="col-sm-12 tweet">
-  <td><%= status.content %></td>
+  <p><%= status.content %></p>
   <div class="tweet-info">
     <%= link_to 'Show', status %> |
     <%= link_to 'Edit', edit_status_path(status) %> |
@@ -100,4 +100,62 @@ En app/views/statuses/index.html.erb sustituir todo el código por:
 </div>
 <% end %>
 ```
+
+Cambiar link show por un link de hace cuanto fue publicado el mensaje.
+En app/views/statuses/index.html.erb:
+
+```
+...
+
+<p><%= status.content %></p>
+<%= link_to time_ago_in_words(status.created_at), status %>
+<div class="tweet-info">
+  <%= link_to 'Edit', edit_status_path(status) %> |
+  <%= link_to 'Destroy', status, method: :delete, data: { confirm: 'Are you sure?' } %>
+</div>
+
+...
+```
+
+###Modificar Rutas
+
+En config/routes.rb agregar:
+```
+root 'statuses#index'
+```
+
+Modificar navegación. En app/views/layouts/application.html.erb cambiar:
+```
+<a class="navbar-brand" href="#">Twitter</a>
+```
+por
+```
+<%= link_to "Twitter", root_path, class: "navbar-brand" %>
+```
+
+###Ordenar Tweets
+En app/controllers/statuses_controllers cambiar el contenido de index por:
+```
+@statuses = Status.order('created_at DESC').all
+```
+
+###Generar información aleatoria y paginación
+En Gemfile agregar
+```
+gem 'faker', group: :development
+```
+Ejecutar
+```
+bundle install
+```
+
+Para usar Faker en db/seeds.rb agregar:
+```
+50.times do
+  content = Faker::Lorem.sentence(5)
+  time = 1.year.ago..Time.now
+  Status.create!(content: content, created_at: time)
+end
+```
+
 
