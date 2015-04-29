@@ -32,7 +32,7 @@ Incluir en app/assets/javascripts/application.js (Después de //= require jquery
 
 ```
 //= require bootstrap-sprockets
-``
+```
 
 Crear generador de Simple Form
 ```
