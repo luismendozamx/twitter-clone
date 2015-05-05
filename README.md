@@ -14,7 +14,7 @@ Para poder seguir este tutorial se requiere:
 
 ### Crear Aplicación
 
-```
+```sh
 rails new twitter --database=postgresql --skip-test-unit
 rake db:create
 rake db:migrate
@@ -22,43 +22,43 @@ rake db:migrate
 
 Agregar gems iniciales. En Gemfile:
 
-```
+```ruby
 gem 'bootstrap-sass', '~> 3.3.4'
 gem 'simple_form'
 ```
 
 Instalar gems. Ejecutar:
-```
+```sh
 bundle install
 ```
 Renombrar app/assets/stylesheets/application.css a app/assets/stylesheets/application.scss
 
 Incluir en app/assets/stylesheets/application.css
 
-```
+```sass
 @import "bootstrap-sprockets";
 @import "bootstrap";
 ```
 Incluir en app/assets/javascripts/application.js (Después de //= require jquery)
 
-```
+```sass
 //= require bootstrap-sprockets
 ```
 
 Crear generador de Simple Form
-```
+```sh
 rails generate simple_form:install --bootstrap
 ```
 
 Reiniciar el servidor para mostrar cambios.
 
 ### Crear el primer scaffold
-```
+```sh
 rails generate scaffold status content:string
 ```
 
 Generar migración en la base
-```
+```sh
 rake db:migrate
 ```
 ### Mejorar nuestras vistas
@@ -67,7 +67,7 @@ Borrar el contenido de app/assets/stylesheets/scaffolds.css.scss
 
 En app/views/layouts/application.html.erb cambiar el código dentro de <body> por:
 
-```
+```erb
 <nav class="navbar navbar-default">
   <div class="container">
     <div class="navbar-header">
@@ -95,7 +95,7 @@ En app/views/layouts/application.html.erb cambiar el código dentro de <body> po
 
 En app/views/statuses/index.html.erb sustituir todo el código por:
 
-```
+```erb
 <%= link_to 'Post New Tweet', new_status_path, class: "btn btn-default" %>
 
 <h1>Twitter Feed</h1>
@@ -115,7 +115,7 @@ En app/views/statuses/index.html.erb sustituir todo el código por:
 Cambiar link show por un link de hace cuanto fue publicado el mensaje.
 En app/views/statuses/index.html.erb:
 
-```
+```erb
 ...
 
 <p><%= status.content %></p>
@@ -131,38 +131,38 @@ En app/views/statuses/index.html.erb:
 ### Modificar Rutas
 
 En config/routes.rb agregar:
-```
+```ruby
 root 'statuses#index'
 ```
 
 Modificar navegación. En app/views/layouts/application.html.erb cambiar:
-```
+```erb
 <a class="navbar-brand" href="#">Twitter</a>
 ```
 por
-```
+```erb
 <%= link_to "Twitter", root_path, class: "navbar-brand" %>
 ```
 
 ### Ordenar Tweets
 En app/controllers/statuses_controllers.rb cambiar el contenido de index por:
-```
+```ruby
 @statuses = Status.order('created_at DESC').all
 ```
 
 ### Generar información aleatoria y paginación
 En Gemfile agregar
-```
+```ruby
 gem 'faker', group: :development
 gem 'will_paginate'
 ```
 Ejecutar
-```
+```sh
 bundle install
 ```
 
 Para usar Faker en db/seeds.rb agregar:
-```
+```ruby
 50.times do
   content = Faker::Lorem.sentence(5)
   time = 1.year.ago..Time.now
@@ -171,19 +171,19 @@ end
 ```
 
 Apagar servidor y correr:
-```
+```sh
 rake db:reset
 ```
 
 Para agregar paginación en app/controllers/statuses_controllers.rb
 
 En app/controllers/statuses_controllers.rb cambiar el contenido de index por:
-```
+```ruby
 @statuses = Status.paginate(page: params[:page], per_page: 10).order('created_at DESC').all
 ```
 
 En app/views/statuses/index.html.erb agregar:
-```
+```ruby
 <%= will_paginate %>
 ```
 
