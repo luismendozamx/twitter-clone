@@ -81,7 +81,7 @@ En app/views/layouts/application.html.erb cambiar el código dentro de <body> po
     </div>
 
     <div class="collapse navbar-collapse" id="navbar-collapse">
-      <ul class="nav navbar-nav">
+      <ul class="nav navbar-nav navbar-right">
         <li><a href="#">Link</a></li>
       </ul>
     </div>
@@ -247,6 +247,90 @@ Generar model de User a través de devise:
 rails generate devise User
 ```
 
+Generar vistas de autenticación:
 
+```sh
+rails generate devise:views
+```
 
+En la migración generada agregar dentro del método create_table(:users) :
+
+```ruby
+t.string :first_name
+t.string :last_name
+t.string :username
+```
+
+Debajo de add_index :users, :reset_password_token, unique: true agregar:
+```ruby
+add_index :users, :username, unique: true
+```
+
+Generar migración:
+
+```sh
+rake db:migrate
+```
+
+Reiniciar el servidor.
+
+Ahora debemos modificar las vistas generadas por devise y agregar los campos que nosotros definimos.
+
+En app/views/devise/registrations/new.html.erb, debajo de la propiedad de email agregar:
+
+```ruby
+<%= f.input :username, required: true %>
+<%= f.input :first_name, required: true %>
+<%= f.input :last_name, required: true %>
+```
+
+Para permitir que nuestra aplicación acepte los parametros de usuario que agregamos debemos indicarle a devise cuales son los parámetros permitidos para un usuario. En app/controllers/application_controller.rb agregar:
+
+```ruby
+before_action :configure_permitted_parameters, if: :devise_controller?
+
+  protected
+    def configure_permitted_parameters
+      devise_parameter_sanitizer.for(:sign_up) { |u| u.permit(:email, :username, :first_name, :last_name, :password, :password_confirm) }
+    end
+```
+
+### Agregar validaciones de usuario.
+
+En app/models/user.rb agregar:
+```ruby
+validates :first_name, :last_name, :username, :email, presence: true
+
+validates :email, uniqueness: true
+
+validates :username, uniqueness: { case_sensitive: false, message: "Username already taken" }
+```
+
+Para mejorar las rutas que nos proporciona devise agregamos en config/routes.rb lo siguiente:
+```ruby
+devise_scope :user do
+  get 'register', to: 'devise/registrations#new', as: :register
+  get 'login', to: 'devise/sessions#new', as: :login
+  get 'logout', to: 'devise/sessions#destroy', as: :logout
+end
+```
+
+Para utilizar estos links en nuestra app agregamos las rutas a la navegación en app/views/layout/application.html.erb dentro de <ul class="nav navbar-nav">
+
+```erb
+<% if user_signed_in? %>
+  <li><%= link_to "Log Out", logout_path %></li>
+<% else %>
+  <li><%= link_to "Log In", login_path %></li>
+  <li><%= link_to "Sign Up", register_path %></li>
+<% end %>
+```
+
+### Asignar status a un usuario
+
+Primero debemos generar una migración a la tabla statuses donde incluiamos el id del usuario.
+
+```sh
+rails generate migration add_user_id_to_statuses
+```
 
