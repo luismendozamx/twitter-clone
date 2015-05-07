@@ -181,6 +181,7 @@ En app/controllers/statuses_controllers.rb cambiar el contenido de index por:
 ```
 @statuses = Status.paginate(page: params[:page], per_page: 10).order('created_at DESC').all
 ```
+Reiniciar servidor
 
 En app/views/statuses/index.html.erb agregar:
 ```
