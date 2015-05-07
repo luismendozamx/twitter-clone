@@ -188,6 +188,65 @@ En app/views/statuses/index.html.erb agregar:
 <%= will_paginate %>
 ```
 
+## Parte 2
+
+### Usuarios y Autenticación
+
+Instalar [Devise](https://github.com/plataformatec/devise) para autenticación de usuarios.
+
+En Gemfile agregar:
+
+```ruby
+gem 'devise'
+```
+
+Intsalar en nuestra aplicación:
+
+```sh
+bundle install
+```
+
+Para empezar a utilizar devise debemos configurar varios pasos. Correr:
+
+```sh
+rails generate devise:install
+```
+Seguir los pasos que devise nos indica.
+
+Agregar en config/environments/development.rb
+
+```ruby
+config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+```
+
+En app/views/layout/application.html.erb agregar
+
+```erb
+<% if flash[:notice] %>
+  <div class="alert alert-success alert-dismissible" role="alert">
+    <div class="container">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <p><%= notice %></p>
+    </div>
+  </div>
+<% end %>
+
+<% if flash[:alert] %>
+  <div class="alert alert-danger alert-dismissible" role="alert">
+    <div class="container">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <p><%= alert %></p>
+    </div>
+  </div>
+<% end %>
+```
+
+Generar model de User a través de devise:
+
+```sh
+rails generate devise User
+```
+
 
 
 
