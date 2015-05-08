@@ -165,8 +165,7 @@ Para usar Faker en db/seeds.rb agregar:
 ```ruby
 50.times do
   content = Faker::Lorem.sentence(5)
-  time = 1.year.ago..Time.now
-  Status.create!(content: content, created_at: time)
+  Status.create!(content: content)
 end
 ```
 
@@ -276,7 +275,7 @@ Reiniciar el servidor.
 
 Ahora debemos modificar las vistas generadas por devise y agregar los campos que nosotros definimos.
 
-En app/views/devise/registrations/new.html.erb, debajo de la propiedad de email agregar:
+En app/views/devise/registrations/new.html.erb y app/views/devise/registrations/new.html.erb, debajo de la propiedad de email agregar:
 
 ```ruby
 <%= f.input :username, required: true %>
@@ -300,9 +299,7 @@ before_action :configure_permitted_parameters, if: :devise_controller?
 En app/models/user.rb agregar:
 ```ruby
 validates :first_name, :last_name, :username, :email, presence: true
-
 validates :email, uniqueness: true
-
 validates :username, uniqueness: { case_sensitive: false, message: "Username already taken" }
 ```
 
@@ -315,10 +312,19 @@ devise_scope :user do
 end
 ```
 
+Vamos a agregar un método a user.rb para que nos regrese el nombre completo:
+
+```
+def full_name
+  first_name + " " + last_name
+end
+```
+
 Para utilizar estos links en nuestra app agregamos las rutas a la navegación en app/views/layout/application.html.erb dentro de <ul class="nav navbar-nav">
 
 ```erb
 <% if user_signed_in? %>
+  <li><%= link_to current_user.full_name, edit_user_registration_path %></li>
   <li><%= link_to "Log Out", logout_path %></li>
 <% else %>
   <li><%= link_to "Log In", login_path %></li>
@@ -334,3 +340,72 @@ Primero debemos generar una migración a la tabla statuses donde incluiamos el i
 rails generate migration add_user_id_to_statuses
 ```
 
+En nunestra migración generada agregar dentro del método change:
+```ruby
+add_column :statuses, :user_id, :integer
+```
+
+Correr migración:
+
+```
+rake db:migrate
+```
+
+### Agregar relaciones entre usuario y status
+
+En app/models/user.rb agregar:
+
+```ruby
+has_many :statuses
+```
+
+En app/models/status.rb agregar:
+
+```ruby
+belongs_to :user
+```
+
+### Filtros en controladores
+
+Para asegurarnos que el usuario haya ingresado antes de crear, editar o borrar un tweet debemos agregar un filtro en app/controllers/statuses_controller.rb, utilizamos un filtro de autenticación que viene incluido en Devise.
+
+```ruby
+before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
+```
+
+### Agregar id de usuario al generar un tweet
+
+En el controlador de statuses, dentro del método create agregar después de @status = Status.new(status_params)
+
+```ruby
+@status.user_id = current_user.id
+```
+
+Finalmente queremos mostrar el nombre del usuario al generar un tweet. Primero debemos eliminar los tweets que tenemos y generar nuevos tweets que pertenezcan a usuarios aleatorios.
+
+Cerrar todo lo que esté conectado a nuestra BD y remplazar to lo que exitse en db/seeds.rb por:
+
+```ruby
+50.times do |n|
+  first_name  = Faker::Name.first_name
+  last_name  = Faker::Name.last_name
+  email = "example-#{n+1}@twitter.com"
+  password = "password"
+  username = "user#{n+1}"
+  User.create!(first_name: first_name, last_name: last_name, username: username, email: email, password: password)
+end
+
+200.times do |n|
+  content = Faker::Lorem.sentence(5)
+  user_id = rand(1..50)
+  Status.create!(content: content, user_id: user_id)
+end
+```
+
+Por último debemos mostrar el nombre completo del usuario en el tweet.
+
+En app/views/statuses/index.html.erb agregar:
+
+```erb
+<h5><%= status.user.full_name %></h5>
+```

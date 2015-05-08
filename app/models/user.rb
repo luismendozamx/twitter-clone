@@ -10,4 +10,10 @@ class User < ActiveRecord::Base
 
   validates :username, uniqueness: { case_sensitive: false, message: "Username already taken" }
 
+  has_many :statuses
+
+  def full_name
+    first_name + " " + last_name
+  end
+
 end
