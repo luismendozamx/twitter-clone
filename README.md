@@ -402,10 +402,10 @@ end
 end
 ```
 
-Por último debemos mostrar el nombre completo del usuario en el tweet.
+Por último debemos mostrar el nombre completo y username del usuario en el tweet.
 
 En app/views/statuses/index.html.erb agregar:
 
 ```erb
-<h5><%= status.user.full_name %></h5>
+<h5><%= status.user.full_name %> (@<%= status.user.username %>)</h5>
 ```

@@ -4,7 +4,7 @@
 
 <% @statuses.each do |status| %>
 <div class="col-sm-12 tweet">
-  <h5><%= status.user.full_name %></h5>
+  <h5><%= status.user.full_name %> (@<%= status.user.username %>)</h5>
   <p><%= status.content %></p>
   <%= link_to time_ago_in_words(status.created_at), status %>
   <div class="tweet-info">
